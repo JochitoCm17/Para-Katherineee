@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para el Amor de Mi Vida</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0b0b0b;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .container {
+            text-align: center;
+            max-width: 650px;
+            padding: 20px;
+            z-index: 10;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        h1 {
+            color: #ff4d6d;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(255, 73, 109, 0.3);
+        }
+        .main-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            line-height: 1.6;
+            font-size: 1.1rem;
+            text-align: justify;
+        }
+        .btn-love {
+            background: linear-gradient(45deg, #ff4d6d, #ff758f);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(255, 73, 109, 0.4);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .btn-love:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(255, 73, 109, 0.6);
+        }
+        
+        /* Secciones principales */
+        .cards-section, .final-section {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            width: 100%;
+        }
+        
+        .love-card {
+            display: none;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            padding: 20px;
+            align-items: center;
+            gap: 20px;
+            text-align: left;
+            animation: fadeIn 0.5s ease forwards;
+            box-sizing: border-box;
+        }
+
+        /* Corregido el conflicto de visualización en pantallas pequeñas */
+        @media(max-width: 599px) { 
+            .love-card.active-card { 
+                display: block !important; 
+                text-align: center; 
+            } 
+        }
+
+        .card-img {
+            flex: 1;
+            max-width: 250px;
+            width: 100%;
+            border-radius: 10px;
+            border: 2px solid #ff4d6d;
+            box-shadow: 0 0 15px rgba(255, 73, 109, 0.3);
+            margin: 0 auto;
+        }
+        .card-img img { width: 100%; border-radius: 8px; display: block; }
+        .card-text { flex: 1; font-size: 1.1rem; line-height: 1.6; font-style: italic; }
+        .nav-buttons { margin-top: 20px; display: flex; justify-content: space-between; gap: 10px; }
+        
+        .btn-nav {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            flex: 1;
+            font-size: 1rem;
+        }
+        .btn-nav:hover { background: rgba(255, 47, 109, 0.2); border-color: #ff4d6d; }
+
+        /* Estilos del Reproductor Spotify con Disco Vinilo */
+        .spotify-player {
+            background: #121212;
+            border-radius: 15px;
+            padding: 25px;
+            max-width: 320px;
+            margin: 0 auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            border: 1px solid #282828;
+            text-align: left;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .cover-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .spotify-cover {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 5px solid #282828;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            object-fit: cover;
+            animation: rotateDisk 8s linear infinite;
+            animation-play-state: paused;
+        }
+        @keyframes rotateDisk {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .track-info .title { font-size: 1.4rem; font-weight: bold; color: #fff; margin: 0; }
+        .track-info .artist { font-size: 1rem; color: #b3b3b3; margin: 5px 0 20px 0; }
+        
+        .progress-bar-container { width: 100%; height: 4px; background: #4f4f4f; border-radius: 2px; position: relative; margin-bottom: 15px; }
+        .progress-bar { width: 0%; height: 100%; background: #1db954; border-radius: 2px; transition: width 0.1s linear; }
+        
+        .time-info { display: flex; justify-content: space-between; font-size: 0.8rem; color: #b3b3b3; margin-bottom: 15px; }
+        .player-controls { display: flex; justify-content: center; align-items: center; gap: 20px; font-size: 1.5rem; color: #fff; }
+        .play-btn { font-size: 2.5rem; color: #fff; cursor: pointer; user-select: none; }
+
+        .lyrics-container {
+            min-height: 50px;
+            margin-top: 15px;
+            text-align: center;
+            font-size: 0.95rem;
+            color: #ff4d6d;
+            font-style: italic;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        /* Animación del Corazón de Transición */
+        .heart-loader {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            font-size: 10rem;
+            color: #ff4d6d;
+            z-index: 100;
+            text-shadow: 0 0 30px rgba(255, 73, 109, 0.6);
+        }
+        @keyframes drawHeart {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(30); opacity: 0; }
+        }
+
+        /* --- RAMO DE LIRIOS EN CSS PURO --- */
+        .bouquet-container {
+            position: relative;
+            width: 200px;
+            height: 220px;
+            margin: 0 auto 25px auto;
+        }
+        
+        .stem {
+            position: absolute;
+            width: 4px;
+            height: 120px;
+            background: #2d6a4f;
+            bottom: 20px;
+            left: 50%;
+            transform-origin: bottom center;
+            border-radius: 2px;
+        }
+        .stem-1 { transform: translateX(-10px) rotate(-15deg); height: 130px; }
+        .stem-2 { transform: translateX(-2px) rotate(0deg); }
+        .stem-3 { transform: translateX(6px) rotate(15deg); height: 130px; }
+
+        .leaf {
+            position: absolute;
+            width: 15px;
+            height: 35px;
+            background: #40916c;
+            border-radius: 0 100% 0 100%;
+            transform: rotate(-45deg);
+        }
+        .stem-1 .leaf { top: 40px; left: -12px; }
+        .stem-3 .leaf { top: 50px; right: -12px; transform: scaleX(-1) rotate(-45deg); }
+
+        .lily {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            animation: growFlower 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            opacity: 0;
+            transform: scale(0);
+        }
+        .lily-1 { top: 20px; left: 30px; animation-delay: 0.2s; }
+        .lily-2 { top: 5px; left: 75px; animation-delay: 0.5s; }
+        .lily-3 { top: 25px; left: 120px; animation-delay: 0.8s; }
+
+        .petal {
+            position: absolute;
+            width: 18px;
+            height: 35px;
+            background: #fefae0; 
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            bottom: 25px;
+            left: 16px;
+            transform-origin: bottom center;
+            box-shadow: inset 0 -5px 10px rgba(255, 183, 3, 0.2), 0 0 10px rgba(255,255,255,0.4);
+        }
+        .p1 { transform: rotate(0deg); }
+        .p2 { transform: rotate(60deg); }
+        .p3 { transform: rotate(120deg); }
+        .p4 { transform: rotate(180deg); }
+        .p5 { transform: rotate(240deg); }
+        .p6 { transform: rotate(300deg); }
+
+        .lily-center {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #ffb703;
+            border-radius: 50%;
+            top: 20px;
+            left: 19px;
+            box-shadow: 0 0 8px #ffb703;
+            z-index: 5;
+        }
+        
+        .lily-2 .lily-center {
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+        .lily-2 .lily-center:hover {
+            transform: scale(1.4);
+            background: #ff4d6d;
+            box-shadow: 0 0 12px #ff4d6d;
+        }
+
+        .bow {
+            position: absolute;
+            width: 24px;
+            height: 14px;
+            background: #ff4d6d;
+            bottom: 25px;
+            left: 44%;
+            border-radius: 4px;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            animation: growFlower 1s ease forwards;
+            animation-delay: 1.1s;
+            opacity: 0;
+            transform: scale(0);
+        }
+        .bow::before, .bow::after {
+            content: '';
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background: #ff4d6d;
+            border-radius: 50%;
+            top: -2px;
+        }
+        .bow::before { left: -7px; }
+        .bow::after { right: -7px; }
+
+        @keyframes growFlower {
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .flower-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 73, 109, 0.2);
+            box-shadow: 0 0 30px rgba(255, 73, 109, 0.15);
+            animation: fadeIn 1s ease forwards;
+        }
+
+        /* --- CONTENEDOR DEL EASTER EGG --- */
+        .easter-egg-section {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            width: 100%;
+            animation: fadeIn 0.6s ease forwards;
+        }
+        .sketch-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 73, 109, 0.3);
+            box-shadow: 0 0 35px rgba(255, 73, 109, 0.2);
+        }
+        .sketch-img-wrapper {
+            max-width: 400px;
+            width: 100%;
+            margin: 0 auto 20px auto;
+            border-radius: 12px;
+            border: 3px solid #ff4d6d;
+            box-shadow: 0 0 20px rgba(255, 73, 109, 0.4);
+            overflow: hidden;
+        }
+        .sketch-img-wrapper img {
+            width: 100%;
+            display: block;
+        }
+
+        .typewriter-text::after {
+            content: '|';
+            animation: blink 0.7s infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        /* Animaciones generales */
+        .heart { position: absolute; color: #ff4d6d; font-size: 20px; animation: fall linear forwards; opacity: 0.8; pointer-events: none; }
+        @keyframes fall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(360deg); opacity: 0; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <audio id="love-song" src="yoko.mp3"></audio>
+
+    <div class="container">
+        <h1 id="main-title">Feliz Cumpleaños Mi Vida 💖</h1>
+        
+        <!-- Bloque Inicial -->
+        <div id="initial-block">
+            <div class="main-card">
+                <p><strong>Querida Katherine:</strong></p>
+                <p>Hoy es un día sumamente especial porque celebras el día en que naciste. Sos mi inspiración más hermosa, la obra detrás de cada dibujo y cada línea de código que hice. No te imaginas lo mucho que anhelo que el tiempo avance para estar contigo frente a frente. Que este día sea muy hermoso para ti mi reina. No olvides que jamas voy a dejar de amarte y te lo recuerdo una vez mas, Te amo con todo mi corazón.</p>
+            </div>
+            <button class="btn-love" onclick="showLoveCards()">Ver tarjetas de amor ✨</button>
+        </div>
+
+        <!-- Bloque de Tarjetas de Amor -->
+        <div id="cards-section" class="cards-section">
+            
+            <!-- Tarjeta 1 -->
+            <div class="love-card" id="card-0">
+                <div class="card-img"><img src="kath.jpeg" alt="Katherine 1"></div>
+                <div class="card-text">
+                    <p>"Cuando me preguntan que te gusta mas de ella, yo diria: Su mirada y sus ojos hermosos, Sos el arte más lindo que mis ojos han tenido el privilegio de contemplar."</p>
+                </div>
+            </div>
+
+            <!-- Tarjeta 2 -->
+            <div class="love-card" id="card-1">
+                <div class="card-img"><img src="kath2.jpeg" alt="Katherine 2"></div>
+                <div class="card-text">
+                    <p>"Incluso detrás de unos cristales, tus ojos brillan con una fuerza que desarma cualquier escudo en mí Eres mi inspiración para crear, soñar y persistir dia con dia por un motivo."</p>
+                </div>
+            </div>
+
+            <!-- Tarjeta 3 -->
+            <div class="love-card" id="card-2">
+                <div class="card-img"><img src="WhatsApp Image 2026-07-19 at 9.26.58 PM.jpeg" alt="Katherine 3"></div>
+                <div class="card-text">
+                    <p>"Cada detalle tuyo es increible y me encanta El reflejo de tu cabello, la dulzura de tus ojos, no importa la distancia ni las barreras, mi corazón siempre regresa a ti."</p>
+                </div>
+            </div>
+
+            <!-- Tarjeta 4: Reproductor Interactivo -->
+            <div class="love-card" id="card-3" style="background: transparent; border: none; backdrop-filter: none; justify-content: center;">
+                <div class="spotify-player">
+                    <div class="cover-container">
+                        <img src="yoko.jpeg" id="disk-cover" class="spotify-cover" alt="Album Sayonara">
+                    </div>
+                    <div class="track-info">
+                        <p class="title">Yoko</p>
+                        <p class="artist">Álvaro Díaz</p>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div id="progress" class="progress-bar"></div>
+                    </div>
+                    <div class="time-info">
+                        <span id="current-time">0:00</span>
+                        <span>0:30</span>
+                    </div>
+                    <div class="player-controls">
+                        <span>⏮</span>
+                        <span id="play-icon" class="play-btn" onclick="toggleAudio()">▶</span>
+                        <span>⏭</span>
+                    </div>
+                    <div id="lyrics" class="lyrics-container">
+                        Haz clic en reproducir para escuchar a Alvarito
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controles de navegación -->
+            <div class="nav-buttons">
+                <button class="btn-nav" onclick="changeCard(-1)">◀ Anterior</button>
+                <button class="btn-nav" id="next-btn" onclick="changeCard(1)">Siguiente ▶</button>
+            </div>
+        </div>
+
+        <!-- Sección Final -->
+        <div id="final-section" class="final-section">
+            <div class="flower-card" id="flower-main-card">
+                
+                <div class="bouquet-container">
+                    <div class="stem stem-1"><div class="leaf"></div></div>
+                    <div class="stem stem-2"></div>
+                    <div class="stem stem-3"><div class="leaf"></div></div>
+                    
+                    <div class="lily lily-1">
+                        <div class="petal p1"></div><div class="petal p2"></div>
+                        <div class="petal p3"></div><div class="petal p4"></div>
+                        <div class="petal p5"></div><div class="petal p6"></div>
+                        <div class="lily-center"></div>
+                    </div>
+                    
+                    <!-- Flor del centro con la función del Easter Egg -->
+                    <div class="lily lily-2">
+                        <div class="petal p1"></div><div class="petal p2"></div>
+                        <div class="petal p3"></div><div class="petal p4"></div>
+                        <div class="petal p5"></div><div class="petal p6"></div>
+                        <div class="lily-center" onclick="openEasterEgg()" title="¿Qué pasa si presionas aquí? 🔍"></div>
+                    </div>
+                    
+                    <div class="lily lily-3">
+                        <div class="petal p1"></div><div class="petal p2"></div>
+                        <div class="petal p3"></div><div class="petal p4"></div>
+                        <div class="petal p5"></div><div class="petal p6"></div>
+                        <div class="lily-center"></div>
+                    </div>
+                    
+                    <div class="bow"></div>
+                </div>
+
+                <h2>Te prometí flores... 💐</h2>
+                <p id="typewriter" class="typewriter-text" style="font-size: 1.1rem; line-height: 1.6; font-style: italic; text-align: justify; min-height: 150px;"></p>
+            </div>
+        </div>
+
+        <!-- Sección del Easter Egg Oculto -->
+        <div id="easter-egg-section" class="easter-egg-section">
+            <div class="sketch-card">
+                <h2 style="color: #ff4d6d; margin-bottom: 15px;">|Mi dibujo de ti Favorito| 🎨</h2>
+                <div class="sketch-img-wrapper">
+                    <img src="dibujo.jpeg" alt="Dibujo de mi niña hermosa">
+                </div>
+                <p style="font-style: italic; line-height: 1.6; font-size: 1.05rem; margin-bottom: 20px;">
+                    "No hay trazo en ese papel que logre hacer justicia la perfección de tu rostro, pero cada línea de dibujo lleva grabado lo mucho que te amo."
+                </p>
+                <button class="btn-nav" onclick="closeEasterEgg()" style="border-color: #ff4d6d; background: rgba(255, 73, 109, 0.15);">◀ Volver a mis flores</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="heart-loader" class="heart-loader">❤️</div>
+
+    <script>
+        const audio = document.getElementById('love-song');
+        const playIcon = document.getElementById('play-icon');
+        const diskCover = document.getElementById('disk-cover');
+        const progressBar = document.getElementById('progress');
+        const currentTimeLabel = document.getElementById('current-time');
+        const lyricsLabel = document.getElementById('lyrics');
+
+        const START_TIME = 0; 
+        const DURATION = 30;   
+        let isPlaying = false;
+
+        const lyricsTimeline = [
+            { time: 0, text: "Haz clic en reproducir para escuchar nuestra canción..." },
+            { time: 0.1, text: "🎵 No es secreto  🎵" },
+            { time: 1.8, text: "Tu me tienes loco..." },
+            { time: 5.8, text: "Me siento en LSD " },
+            { time: 8.3, text: "Cuando te toco" },
+            { time: 11.5, text: "Soy un tonto" },
+            { time: 13.0, text: "Y mil veces me equivoco" },
+            { time: 17.0, text: "Te quiero siempre" },
+            { time: 17.8, text: " A mi ladito como Yoko" },
+            { time: 24.0, text: "Ooohhh no te vayas Nunca" }
+        ];
+
+        const finalLetterText = "Y un caballero siempre sostiene su palabra. Quizás hoy la distancia y las circunstancias me impidieron dejártelas físicamente en el portón, pero mi mente y mi corazón no conocen de barreras. Aquí tienes un pequeño detalle y recuerdo digital por ahora, pero con la promesa intacta de que muy pronto te daré todo lo que me pidas. Te mando un beso y un abrazo y Feliz cumpleaños mi niña hermosa.";
+
+        function showLoveCards() {
+            document.getElementById('initial-block').style.display = 'none';
+            const section = document.getElementById('cards-section');
+            section.style.display = 'block';
+            setTimeout(() => { section.style.opacity = '1'; }, 10);
+            showCurrentCard();
+        }
+
+        let currentCardIndex = 0;
+        const totalCards = 4;
+
+        function showCurrentCard() {
+            const nextBtn = document.getElementById('next-btn');
+            if (currentCardIndex === 3) {
+                nextBtn.innerHTML = "Terminar Libro ✨";
+            } else {
+                nextBtn.innerHTML = "Siguiente ▶";
+                if(isPlaying) toggleAudio();
+            }
+
+            for (let i = 0; i < totalCards; i++) {
+                const card = document.getElementById(`card-${i}`);
+                if (i === currentCardIndex) {
+                    card.classList.add('active-card'); // Añade clase de control
+                    if (i === 3) {
+                        card.style.setProperty('display', 'flex', 'important');
+                    } else {
+                        card.style.setProperty('display', window.innerWidth >= 600 ? 'flex' : 'block', 'important');
+                    }
+                } else {
+                    card.classList.remove('active-card');
+                    card.style.setProperty('display', 'none', 'important'); // Forzar el ocultado
+                }
+            }
+        }
+
+        function changeCard(direction) {
+            if (currentCardIndex === 3 && direction === 1) {
+                triggerHeartTransition();
+                return;
+            }
+            currentCardIndex += direction;
+            if (currentCardIndex >= totalCards) currentCardIndex = 0;
+            if (currentCardIndex < 0) currentCardIndex = totalCards - 1;
+            showCurrentCard();
+        }
+
+        function toggleAudio() {
+            if (!isPlaying) {
+                if (audio.currentTime < START_TIME || audio.currentTime >= START_TIME + DURATION) {
+                    audio.currentTime = START_TIME;
+                }
+                audio.play();
+                playIcon.innerHTML = "⏸";
+                diskCover.style.animationPlayState = 'running';
+                isPlaying = true;
+            } else {
+                audio.pause();
+                playIcon.innerHTML = "▶";
+                diskCover.style.animationPlayState = 'paused';
+                isPlaying = false;
+            }
+        }
+
+        audio.addEventListener('timeupdate', () => {
+            if (audio.currentTime < START_TIME) return;
+            let elapsed = audio.currentTime - START_TIME;
+
+            if (elapsed >= DURATION) {
+                audio.pause();
+                audio.currentTime = START_TIME + DURATION;
+                playIcon.innerHTML = "▶";
+                diskCover.style.animationPlayState = 'paused';
+                isPlaying = false;
+                elapsed = DURATION;
+            }
+
+            const pct = (elapsed / DURATION) * 100;
+            progressBar.style.width = `${pct}%`;
+
+            let s = Math.floor(elapsed);
+            currentTimeLabel.innerHTML = `0:${s < 10 ? '0' : ''}${s}`;
+
+            const currentLyric = lyricsTimeline.reduce((prev, curr) => {
+                if (elapsed >= curr.time) return curr;
+                return prev;
+            }, lyricsTimeline[0]);
+            
+            if(lyricsLabel.innerHTML !== currentLyric.text) {
+                lyricsLabel.innerHTML = currentLyric.text;
+            }
+        });
+
+        function triggerHeartTransition() {
+            if(isPlaying) toggleAudio();
+            const loader = document.getElementById('heart-loader');
+            loader.style.display = 'block';
+            loader.style.animation = 'drawHeart 1.5s ease-in-out forwards';
+
+            setTimeout(() => {
+                document.getElementById('cards-section').style.display = 'none';
+                document.getElementById('main-title').style.display = 'none';
+                
+                const finalSec = document.getElementById('final-section');
+                finalSec.style.display = 'block';
+                setTimeout(() => { 
+                    finalSec.style.opacity = '1'; 
+                    setTimeout(startTypewriter, 1800);
+                }, 50);
+            }, 750);
+
+            setTimeout(() => { loader.style.display = 'none'; }, 1500);
+        }
+
+        let textIndex = 0;
+        let typewriterStarted = false;
+        function startTypewriter() {
+            if(typewriterStarted) return; 
+            typewriterStarted = true;
+            runTypewriter();
+        }
+
+        function runTypewriter() {
+            const element = document.getElementById('typewriter');
+            if (textIndex < finalLetterText.length) {
+                element.innerHTML += finalLetterText.charAt(textIndex);
+                textIndex++;
+                setTimeout(runTypewriter, 50);
+            } else {
+                element.classList.remove('typewriter-text');
+            }
+        }
+
+        function openEasterEgg() {
+            const flowerCard = document.getElementById('flower-main-card');
+            const eggSection = document.getElementById('easter-egg-section');
+            
+            flowerCard.style.display = 'none';
+            eggSection.style.display = 'block';
+            setTimeout(() => { eggSection.style.opacity = '1'; }, 10);
+        }
+
+        function closeEasterEgg() {
+            const flowerCard = document.getElementById('flower-main-card');
+            const eggSection = document.getElementById('easter-egg-section');
+            
+            eggSection.style.display = 'none';
+            eggSection.style.opacity = '0';
+            flowerCard.style.display = 'block';
+        }
+
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerHTML = '❤️';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = Math.random() * 3 + 2 + 's';
+            heart.style.fontSize = Math.random() * 15 + 15 + 'px';
+            document.body.appendChild(heart);
+            setTimeout(() => { heart.remove(); }, 5000);
+        }
+        setInterval(createHeart, 300);
+
+        // Optimización táctil directa para dispositivos móviles
+        const buttons = document.querySelectorAll('.btn-love, .btn-nav, .play-btn, .lily-center');
+        buttons.forEach(btn => {
+            btn.addEventListener('touchstart', function(e) {
+                // Ejecuta el clic inmediatamente al tocar la pantalla sin delay
+                if(this.onclick) {
+                    this.onclick();
+                    e.preventDefault(); 
+                }
+            }, {passive: false});
+        });
+    </script>
+</body>
+</html>
